@@ -17,7 +17,7 @@ export default function HomePage() {
             <p className="text-gray-600 mb-4">
               Friday 22nd August 10am - 1:30pm
             </p>
-            <p>Before we start our adventure together I'd like to gather additional information to ensure we have the best time together</p>
+            <p>Before we start our adventure together I&apos;d like to gather additional information to ensure we have the best time together</p>
           </div>
 
           <RegistrationForm />

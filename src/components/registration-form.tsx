@@ -166,7 +166,7 @@ export function RegistrationForm() {
         </CardHeader>
         <CardContent className="pt-6 space-y-4">
           <div>
-            <Label htmlFor="childNames">Child/Children's Names *</Label>
+            <Label htmlFor="childNames">Child/Children&apos;s Names *</Label>
             <Input
               id="childNames"
               value={formData.childNames}
@@ -179,7 +179,7 @@ export function RegistrationForm() {
           </div>
 
           <div>
-            <Label htmlFor="childAges">Child/Children's Ages *</Label>
+            <Label htmlFor="childAges">Child/Children&apos;s Ages *</Label>
             <Input
               id="childAges"
               value={formData.childAges}
@@ -226,7 +226,7 @@ export function RegistrationForm() {
       <Card className="border-gray-200 bg-gray-50">
         <CardHeader>
           <CardTitle className="text-gray-800">Emergency Contact</CardTitle>
-          <CardDescription>Someone we can reach if you're unavailable</CardDescription>
+          <CardDescription>Someone we can reach if you&apos;re unavailable</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 space-y-4">
           <div>

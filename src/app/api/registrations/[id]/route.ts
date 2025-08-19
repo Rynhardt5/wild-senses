@@ -19,7 +19,7 @@ async function loadRegistrations(): Promise<Registration[]> {
     await ensureDataDirectory()
     const data = await fs.readFile(REGISTRATIONS_FILE, "utf-8")
     return JSON.parse(data)
-  } catch (error) {
+  } catch {
     return []
   }
 }
@@ -29,12 +29,16 @@ async function saveRegistrations(registrations: Registration[]): Promise<void> {
   await fs.writeFile(REGISTRATIONS_FILE, JSON.stringify(registrations, null, 2))
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const updates = await request.json()
     const currentRegistrations = await loadRegistrations()
 
-    const registrationIndex = currentRegistrations.findIndex((reg) => reg.id === params.id)
+    const { id } = await params
+    const registrationIndex = currentRegistrations.findIndex((reg) => reg.id === id)
 
     if (registrationIndex === -1) {
       return NextResponse.json({ error: "Registration not found" }, { status: 404 })
@@ -51,10 +55,14 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const currentRegistrations = await loadRegistrations()
-    const registrationIndex = currentRegistrations.findIndex((reg) => reg.id === params.id)
+    const { id } = await params
+    const registrationIndex = currentRegistrations.findIndex((reg) => reg.id === id)
 
     if (registrationIndex === -1) {
       return NextResponse.json({ error: "Registration not found" }, { status: 404 })

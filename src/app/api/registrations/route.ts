@@ -23,7 +23,7 @@ async function loadRegistrations(): Promise<Registration[]> {
     const registrations = JSON.parse(data)
     console.log("[v0] Successfully loaded registrations:", registrations.length)
     return registrations
-  } catch (error) {
+  } catch {
     console.log("[v0] No existing registrations file found, starting with empty array")
     return []
   }
