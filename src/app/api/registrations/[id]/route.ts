@@ -7,7 +7,6 @@ const GIST_FILENAME = "registrations.json"
 
 async function loadRegistrations(): Promise<Registration[]> {
   try {
-    console.log("[v0] Loading registrations from GitHub Gist for individual operation")
     
     if (!GITHUB_TOKEN || !GIST_ID) {
       console.error("[v0] Missing GitHub token or Gist ID")
@@ -31,10 +30,8 @@ async function loadRegistrations(): Promise<Registration[]> {
 
     if (fileContent) {
       const registrations = JSON.parse(fileContent)
-      console.log("[v0] Successfully loaded registrations for individual operation:", registrations.length)
       return registrations
     } else {
-      console.log("[v0] No existing registrations found")
       return []
     }
   } catch (error) {
@@ -45,7 +42,6 @@ async function loadRegistrations(): Promise<Registration[]> {
 
 async function saveRegistrations(registrations: Registration[]): Promise<void> {
   try {
-    console.log("[v0] Saving registrations to GitHub Gist for individual operation, count:", registrations.length)
     
     if (!GITHUB_TOKEN || !GIST_ID) {
       throw new Error("Missing GitHub token or Gist ID")
@@ -71,7 +67,6 @@ async function saveRegistrations(registrations: Registration[]): Promise<void> {
       throw new Error(`Failed to update gist: ${response.status} ${response.statusText}`)
     }
 
-    console.log("[v0] Registrations saved successfully to GitHub Gist for individual operation")
   } catch (error) {
     console.error("[v0] Error saving registrations to GitHub Gist:", error)
     throw error

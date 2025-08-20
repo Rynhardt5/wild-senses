@@ -4,13 +4,10 @@ import type { Registration } from "./types"
 export async function syncRegistrations(): Promise<Registration[]> {
   if (typeof window !== "undefined") {
     try {
-      console.log("[v0] Making GET request to /api/registrations")
       const response = await fetch("/api/registrations")
-      console.log("[v0] GET response status:", response.status, response.statusText)
 
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] GET response data:", data)
         return data
       } else {
         console.error("[v0] GET request failed:", response.status, response.statusText)

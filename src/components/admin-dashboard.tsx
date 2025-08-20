@@ -99,7 +99,6 @@ export function AdminDashboard() {
   }
 
   const handleEditRegistration = (registration: Registration) => {
-    console.log('[v0] Edit button clicked for registration:', registration.id)
     setEditingRegistration(registration)
     setEditFormData(registration)
   }
@@ -107,11 +106,6 @@ export function AdminDashboard() {
   const saveEditedRegistration = async () => {
     if (!editingRegistration) return
 
-    console.log(
-      '[v0] Saving edited registration:',
-      editingRegistration.id,
-      editFormData
-    )
     try {
       const response = await fetch(
         `/api/registrations/${editingRegistration.id}`,
@@ -122,10 +116,8 @@ export function AdminDashboard() {
         }
       )
 
-      console.log('[v0] Edit response status:', response.status)
       if (!response.ok) throw new Error('Failed to update registration')
 
-      console.log('[v0] Registration updated successfully')
       setEditingRegistration(null)
       setEditFormData({})
       await loadRegistrations()
@@ -138,16 +130,13 @@ export function AdminDashboard() {
   }
 
   const handleDeleteRegistration = async (id: string) => {
-    console.log('[v0] Delete registration called for ID:', id)
     try {
       const response = await fetch(`/api/registrations/${id}`, {
         method: 'DELETE',
       })
 
-      console.log('[v0] Delete response status:', response.status)
       if (!response.ok) throw new Error('Failed to delete registration')
 
-      console.log('[v0] Registration deleted successfully')
       setDeleteConfirmId(null)
       await loadRegistrations()
     } catch (err) {
@@ -231,8 +220,8 @@ export function AdminDashboard() {
 
   if (showPrintView) {
     return (
-      <PrintableRegistrationList 
-        registrations={filteredRegistrations} 
+      <PrintableRegistrationList
+        registrations={filteredRegistrations}
         onBack={() => setShowPrintView(false)}
       />
     )
@@ -431,13 +420,16 @@ export function AdminDashboard() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="text-sm space-y-1">
+                        <div className="text-sm space-y-1 w-24">
                           {registration.allergies && (
                             <div>
                               <span className="font-medium text-red-600">
                                 Allergies:
                               </span>
-                              <p className="text-gray-600">
+                              <p
+                                className="text-gray-600 truncate"
+                                title={registration.allergies}
+                              >
                                 {registration.allergies}
                               </p>
                             </div>
@@ -447,7 +439,10 @@ export function AdminDashboard() {
                               <span className="font-medium text-blue-600">
                                 Special Needs:
                               </span>
-                              <p className="text-gray-600">
+                              <p
+                                className="text-gray-600 truncate"
+                                title={registration.neurodivergencies}
+                              >
                                 {registration.neurodivergencies}
                               </p>
                             </div>
@@ -490,10 +485,6 @@ export function AdminDashboard() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              console.log(
-                                '[v0] Edit button clicked for:',
-                                registration.id
-                              )
                               handleEditRegistration(registration)
                             }}
                             className="text-xs flex items-center gap-1"
@@ -505,10 +496,6 @@ export function AdminDashboard() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              console.log(
-                                '[v0] Delete button clicked for:',
-                                registration.id
-                              )
                               setDeleteConfirmId(registration.id)
                             }}
                             className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 flex items-center gap-1"
