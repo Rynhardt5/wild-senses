@@ -1,39 +1,81 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { promises as fs } from "fs"
-import path from "path"
 import type { RegistrationFormData, Registration } from "@/lib/types"
 
-const DATA_DIR = path.join("/tmp", "wild-senses-data")
-const REGISTRATIONS_FILE = path.join(DATA_DIR, "registrations.json")
-
-async function ensureDataDirectory() {
-  try {
-    await fs.access(DATA_DIR)
-  } catch {
-    console.log("[v0] Creating data directory:", DATA_DIR)
-    await fs.mkdir(DATA_DIR, { recursive: true })
-  }
-}
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN
+const GIST_ID = process.env.GIST_ID
+const GIST_FILENAME = "registrations.json"
 
 async function loadRegistrations(): Promise<Registration[]> {
   try {
-    console.log("[v0] Attempting to read registrations file:", REGISTRATIONS_FILE)
-    await ensureDataDirectory()
-    const data = await fs.readFile(REGISTRATIONS_FILE, "utf-8")
-    const registrations = JSON.parse(data)
-    console.log("[v0] Successfully loaded registrations:", registrations.length)
-    return registrations
-  } catch {
-    console.log("[v0] No existing registrations file found, starting with empty array")
+    console.log("[v0] Attempting to load registrations from GitHub Gist")
+    
+    if (!GITHUB_TOKEN || !GIST_ID) {
+      console.error("[v0] Missing GitHub token or Gist ID")
+      return []
+    }
+
+    const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    })
+
+    if (!response.ok) {
+      console.error("[v0] Failed to fetch gist:", response.status, response.statusText)
+      return []
+    }
+
+    const gist = await response.json()
+    const fileContent = gist.files[GIST_FILENAME]?.content
+
+    if (fileContent) {
+      const registrations = JSON.parse(fileContent)
+      console.log("[v0] Successfully loaded registrations:", registrations.length)
+      return registrations
+    } else {
+      console.log("[v0] No existing registrations found, starting with empty array")
+      return []
+    }
+  } catch (error) {
+    console.error("[v0] Error loading registrations from GitHub Gist:", error)
     return []
   }
 }
 
 async function saveRegistrations(registrations: Registration[]): Promise<void> {
-  await ensureDataDirectory()
-  console.log("[v0] Saving registrations to file:", REGISTRATIONS_FILE)
-  await fs.writeFile(REGISTRATIONS_FILE, JSON.stringify(registrations, null, 2))
-  console.log("[v0] Registrations saved successfully")
+  try {
+    console.log("[v0] Saving registrations to GitHub Gist, count:", registrations.length)
+    
+    if (!GITHUB_TOKEN || !GIST_ID) {
+      throw new Error("Missing GitHub token or Gist ID")
+    }
+
+    const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        files: {
+          [GIST_FILENAME]: {
+            content: JSON.stringify(registrations, null, 2)
+          }
+        }
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to update gist: ${response.status} ${response.statusText}`)
+    }
+
+    console.log("[v0] Registrations saved successfully to GitHub Gist")
+  } catch (error) {
+    console.error("[v0] Error saving registrations to GitHub Gist:", error)
+    throw error
+  }
 }
 
 export async function GET() {
